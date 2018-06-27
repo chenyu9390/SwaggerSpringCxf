@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:cxf="http://cxf.apache.org/core" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util.xsd
+   http://www.springframework.org/schema/beans     
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+   http://www.springframework.org/schema/context 
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+   http://cxf.apache.org/jaxws 
+   http://cxf.apache.org/schemas/jaxws.xsd
+   http://cxf.apache.org/jaxrs
+   http://cxf.apache.org/schemas/jaxrs.xsd
+   http://cxf.apache.org/core 
+   http://cxf.apache.org/schemas/core.xsd">
+
+
+	<bean id="swaggerService" class="com.api.swagger.testService.SwaggerServiceImple"/>
+	<bean id="swaggerService2" class="com.api.swagger.testService2.SwaggerServiceImple"/>
+	
+	<bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider">
+		<property name="namespaceMap" ref="jsonNamespaceMap" />
+		<property name="serializeAsArray" value="false" />
+		<property name="arrayKeys" ref="jsonKeys" />
+		<property name="produceMediaTypes" ref="jsonTypes" />
+		<property name="consumeMediaTypes" ref="jsonTypes" />
+	</bean>
+	
+	<util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
+	
+	</util:map>
+	
+	<!-- CXF Swagger2Feature --> 
+    <bean id="swagger2Feature" class="org.apache.cxf.jaxrs.swagger.Swagger2Feature">
+        <!-- customize some of the properties -->
+        <property name="title" value="API服务端接口"/>
+        <property name="scan" value="true" />
+        <property name="basePath" value="/com.api.swagger"></property>
+        <property name="contact" value="API" />
+        <property name="version" value="1.0"></property>
+        <property name="description" value="xxx"></property>
+        <property name="license" value="xxx"></property>
+        <property name="licenseUrl" value="localhost:8080"></property>
+    </bean>
+
+	<util:list id="jsonKeys">  
+	</util:list>
+
+	<util:list id="jsonTypes">
+		<value>application/json</value>
+		<value>application/x-javascript</value>
+		<value>application/vnd.example-com.foo+json</value>
+	</util:list>
+
+	<jaxrs:server id="restContainer" address="/"> 
+		<jaxrs:serviceBeans>  
+			 <ref bean="swaggerService"/>
+			 <ref bean="swaggerService2"/>
+		</jaxrs:serviceBeans>
+
+		<jaxrs:providers>
+			<ref bean="jsonProvider" />
+		</jaxrs:providers>
+		<jaxrs:features>
+            <ref bean="swagger2Feature" />
+        </jaxrs:features>
+
+	</jaxrs:server>
+
+	<!-- restTemplate -->
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+		<property name="messageConverters">
+			<list>
+				<bean id="stringHttpMessageConverter"
+					class="org.springframework.http.converter.StringHttpMessageConverter" />
+				<bean id="formHttpMessageConverter"
+					class="org.springframework.http.converter.FormHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+</beans>
